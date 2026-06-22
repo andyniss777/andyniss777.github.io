@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Andy — Case File</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+SC:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F6F1E6;
+    --paper-deep: #EFE8D8;
+    --ink: #2A2420;
+    --ink-soft: #5B5347;
+    --rule: #C9BFA8;
+    --ledger: #1F4D3D;
+    --ledger-soft: #3A6B58;
+    --stamp: #A23B2E;
+    --paper-shadow: rgba(42,36,32,0.08);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at top left, rgba(31,77,61,0.04), transparent 50%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans','IBM Plex Sans SC',sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  ::selection{ background: var(--ledger); color: var(--paper); }
+
+  a{ color:var(--ledger); }
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--ledger);
+    outline-offset:3px;
+  }
+
+  .wrap{ max-width: 880px; margin:0 auto; padding: 0 28px; }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    border-bottom:1px solid var(--rule);
+    padding:18px 0;
+  }
+  .topbar-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    max-width:880px; margin:0 auto; padding:0 28px;
+  }
+  .filecode{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+  }
+  .lang-toggle{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.05em;
+    background:none;
+    border:1px solid var(--rule);
+    border-radius:3px;
+    padding:6px 12px;
+    color:var(--ink);
+    cursor:pointer;
+    display:flex; gap:8px; align-items:center;
+  }
+  .lang-toggle:hover{ border-color:var(--ledger); }
+  .lang-toggle .dim{ color:var(--ink-soft); }
+  .lang-toggle .active{ color:var(--ledger); font-weight:600; }
+
+  /* ---------- cover / hero ---------- */
+  .cover{ padding: 56px 0 40px; }
+  .stamp-row{ display:flex; align-items:center; gap:14px; margin-bottom:28px; flex-wrap:wrap; }
+  .stamp{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    border:1.5px solid var(--ledger);
+    color:var(--ledger);
+    padding:5px 10px;
+    border-radius:2px;
+    transform:rotate(-1.5deg);
+    white-space:nowrap;
+  }
+  .stamp.red{ border-color:var(--stamp); color:var(--stamp); transform:rotate(1deg); }
+  .meta-line{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+
+  h1.title{
+    font-family:'Newsreader', serif;
+    font-weight:500;
+    font-size:clamp(40px, 7vw, 64px);
+    line-height:1.05;
+    margin:0 0 8px;
+    letter-spacing:-0.01em;
+  }
+  .title em{ font-style:italic; color:var(--ledger); }
+
+  .role-line{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    font-size:clamp(18px,2.6vw,22px);
+    color:var(--ink-soft);
+    margin:0 0 30px;
+  }
+
+  .bio{
+    font-size:16.5px;
+    color:var(--ink);
+    max-width:62ch;
+    margin:0 0 26px;
+  }
+
+  .xhs{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    border-bottom:1px dashed var(--rule);
+    padding-bottom:2px;
+    color:var(--ink-soft);
+  }
+  .xhs .pill{
+    border:1px dashed var(--rule);
+    border-radius:20px;
+    padding:2px 10px;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+
+  hr.rule{
+    border:none; border-top:1px solid var(--rule); margin: 0;
+  }
+
+  /* ---------- section scaffolding ---------- */
+  section{ padding: 54px 0; border-bottom:1px solid var(--rule); }
+  section:last-of-type{ border-bottom:none; }
+
+  .section-head{
+    display:flex; align-items:baseline; gap:14px; margin-bottom:8px;
+    flex-wrap:wrap;
+  }
+  .section-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:var(--ledger);
+    border:1px solid var(--ledger);
+    border-radius:50%;
+    width:26px; height:26px;
+    display:inline-flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  h2.section-title{
+    font-family:'Newsreader', serif;
+    font-weight:500;
+    font-size:clamp(26px,3.6vw,32px);
+    margin:0;
+  }
+  .section-sub{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    margin: 4px 0 30px 40px;
+  }
+
+  .draft-tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--stamp);
+    border:1px solid var(--stamp);
+    border-radius:2px;
+    padding:2px 7px;
+    transform:rotate(-2deg);
+    margin-left:10px;
+    vertical-align:middle;
+  }
+
+  /* ---------- product ledger ---------- */
+  .ledger{ margin-left:40px; }
+  .product-row{
+    display:grid;
+    grid-template-columns: 64px 1fr;
+    gap:18px;
+    padding:22px 0;
+    border-top:1px solid var(--rule);
+  }
+  .product-row:first-child{ border-top:1px solid var(--rule); }
+  .product-id{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding-top:3px;
+  }
+  .product-name{
+    font-family:'Newsreader', serif;
+    font-weight:600;
+    font-size:19px;
+    margin:0 0 6px;
+  }
+  .product-desc{ font-size:15px; color:var(--ink); margin:0 0 10px; max-width:58ch; }
+  .tags{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ledger-soft);
+    background:rgba(31,77,61,0.07);
+    border-radius:3px;
+    padding:3px 8px;
+  }
+
+  /* ---------- terminal / agent log ---------- */
+  .terminal{
+    margin-left:40px;
+    background: var(--ink);
+    color: #E8E2D2;
+    border-radius:6px;
+    padding:22px 24px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    line-height:1.75;
+    box-shadow: 0 10px 30px var(--paper-shadow);
+    overflow-x:auto;
+  }
+  .terminal .line{ white-space:pre-wrap; }
+  .terminal .prompt{ color:#8FB89C; }
+  .terminal .comment{ color:#8A8270; }
+  .terminal .ok{ color:#C9A227; }
+  .agent-cards{
+    margin-left:40px;
+    margin-top:22px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:640px){ .agent-cards{ grid-template-columns:1fr; } }
+  .agent-card{
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:18px 20px;
+    background: var(--paper-deep);
+  }
+  .agent-card .agent-name{
+    font-family:'Newsreader', serif;
+    font-weight:600;
+    font-size:17px;
+    margin:0 0 6px;
+  }
+  .agent-card p{ margin:0; font-size:14px; color:var(--ink-soft); }
+
+  /* ---------- vision ---------- */
+  .vision-block{ margin-left:40px; max-width:60ch; }
+  blockquote.vision{
+    font-family:'Newsreader', serif;
+    font-style:italic;
+    font-size:clamp(20px,3vw,25px);
+    line-height:1.55;
+    color:var(--ink);
+    margin:0;
+    padding-left:22px;
+    border-left:2px solid var(--ledger);
+  }
+
+  /* ---------- scorecard ---------- */
+  .scorecard{ margin-left:40px; display:flex; flex-direction:column; gap:0; }
+  .score-row{
+    display:grid;
+    grid-template-columns: 1fr 90px;
+    align-items:center;
+    gap:18px;
+    padding:18px 0;
+    border-top:1px solid var(--rule);
+  }
+  .score-row:last-child{ border-bottom:1px solid var(--rule); }
+  .score-label{ font-size:15.5px; }
+  .score-label .strong{ font-weight:600; display:block; margin-bottom:3px; font-family:'Newsreader', serif; font-size:17.5px;}
+  .score-label .desc{ color:var(--ink-soft); font-size:14px; }
+  .score-val{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:14px;
+    color:var(--ledger);
+    text-align:right;
+  }
+  .score-bar{
+    height:4px; background:var(--rule); border-radius:2px; margin-top:6px; overflow:hidden;
+  }
+  .score-bar i{ display:block; height:100%; background:var(--ledger); border-radius:2px; }
+
+  footer{
+    padding:40px 0 60px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    text-align:center;
+  }
+
+  [data-lang="en"]{ display:none; }
+  body.lang-en [data-lang="en"]{ display:initial; }
+  body.lang-en [data-lang="zh"]{ display:none; }
+  body.lang-en .product-name, body.lang-en h1.title, body.lang-en h2.section-title, body.lang-en .agent-name{
+    letter-spacing:-0.005em;
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <span class="filecode">FILE NO. AD-2026-0621 · 案号</span>
+      <button class="lang-toggle" id="langToggle" aria-label="Toggle language">
+        <span class="active" data-tag="zh">中</span><span class="dim">/</span><span class="dim" data-tag="en">EN</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- COVER -->
+    <section class="cover" style="border-bottom:1px solid var(--rule);">
+      <div class="stamp-row">
+        <span class="stamp">ACTIVE · BUILDING</span>
+        <span class="meta-line" data-lang="zh">归档日期 2026.06.21</span>
+        <span class="meta-line" data-lang="en">filed 2026.06.21</span>
+      </div>
+
+      <h1 class="title">
+        <span data-lang="zh">Andy <em>的案卷</em></span>
+        <span data-lang="en">The Case File of <em>Andy</em></span>
+      </h1>
+
+      <p class="role-line">
+        <span data-lang="zh">风控出身，现在用 AI 做产品。</span>
+        <span data-lang="en">Risk-trained. AI-native.</span>
+      </p>
+
+      <p class="bio">
+        <span data-lang="zh">两年信用风控数据分析背景，两年 AI 产品与售前实践。曾任锦安数科 COO，带十人团队跑通从标准化风控产品到定制化建模交付的全链路。最近一年，开始用 Claude Code 与 LLM Agent 把"经验"变成"系统"——从帮销售秒级匹配产品的推荐 Agent，到开源的建模知识库 Kaggle2KnowHow，再到每天自己运转的个人 AI 助理。</span>
+        <span data-lang="en">Two years in credit-risk data analysis, two years building AI products and leading presales. As COO at JinAn Digital, ran a ten-person team across the full chain — from standardized risk products to custom model delivery. Over the past year, I've been turning judgment into systems with Claude Code and LLM agents: a presales recommendation agent, an open-source modeling knowledge base called Kaggle2KnowHow, and a personal AI assistant that runs itself, daily.</span>
+      </p>
+
+      <span class="xhs">
+        <span data-lang="zh">小红书</span><span data-lang="en">Xiaohongshu</span>
+        <span class="pill" data-lang="zh">待补充</span>
+        <span class="pill" data-lang="en">TBD</span>
+      </span>
+    </section>
+
+    <!-- 01 AI PRODUCTS -->
+    <section id="products">
+      <div class="section-head">
+        <span class="section-num">01</span>
+        <h2 class="section-title">
+          <span data-lang="zh">做了哪些 AI 产品</span>
+          <span data-lang="en">AI Products, Shipped</span>
+        </h2>
+      </div>
+      <p class="section-sub">
+        <span data-lang="zh">案件记录 — 按交付物归档</span>
+        <span data-lang="en">case records — filed by deliverable</span>
+      </p>
+
+      <div class="ledger">
+        <div class="product-row">
+          <div class="product-id">№ 01</div>
+          <div>
+            <h3 class="product-name" data-lang="zh">售前智能推荐 Agent</h3>
+            <h3 class="product-name" data-lang="en">Presales Recommendation Agent</h3>
+            <p class="product-desc" data-lang="zh">基于飞书多维表格 + LLM + 飞书机器人架构，把内部研发指标、历史成交数据、联合建模反馈统一沉淀为"产品效果画像库"，销售在群内自然语言提问即可秒级获取 Top 产品推荐。隐性经验显性化。</p>
+            <p class="product-desc" data-lang="en">Built on Feishu multi-dimensional tables, an LLM, and a Feishu bot. Consolidates internal performance metrics, deal history, and joint-modeling feedback into a single "product profile library" — sales can ask in plain language and get a ranked recommendation in seconds. Tacit knowledge, made explicit.</p>
+            <div class="tags">
+              <span class="tag" data-lang="zh">LLM</span><span class="tag" data-lang="en">LLM</span>
+              <span class="tag">Feishu Bot</span>
+              <span class="tag" data-lang="zh">数据聚合</span><span class="tag" data-lang="en">Data Aggregation</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-row">
+          <div class="product-id">№ 02</div>
+          <div>
+            <h3 class="product-name">Kaggle2KnowHow</h3>
+            <p class="product-desc" data-lang="zh">用 Claude Code 构建的开源建模辅助系统。Kaggle Agent 负责案例采集—解析沉淀—RAG 知识库，解决陌生行业建模缺基线的问题；ScenarioAgent 沉淀标品建模与外数评估等自动化技能，辅助日常任务。</p>
+            <p class="product-desc" data-lang="en">An open-source modeling assistant built with Claude Code. The Kaggle Agent collects, parses, and stores cases into a RAG knowledge base — solving the "no baseline" problem when modeling an unfamiliar industry. ScenarioAgent automates recurring tasks like standard modeling and external-data evaluation.</p>
+            <div class="tags">
+              <span class="tag">Claude Code</span>
+              <span class="tag">RAG</span>
+              <span class="tag" data-lang="zh">开源</span><span class="tag" data-lang="en">Open Source</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-row">
+          <div class="product-id">№ 03</div>
+          <div>
+            <h3 class="product-name" data-lang="zh">数据服务与产品管理平台</h3>
+            <h3 class="product-name" data-lang="en">Data Service & Product Management Platform</h3>
+            <p class="product-desc" data-lang="zh">从 0 到 1 主导搭建，覆盖测试质量保障、数据源全生命周期管理、产品/客户/数据源配置化管理、运营自动化、费用统计五大能力，将三方关系抽象为可配置映射规则。</p>
+            <p class="product-desc" data-lang="en">Led the build from zero. Covers test-quality assurance, full data-source lifecycle management, configurable product/client/source mapping, operational automation, and cost accounting — abstracting three-way relationships into configurable rules.</p>
+            <div class="tags">
+              <span class="tag" data-lang="zh">平台架构</span><span class="tag" data-lang="en">Platform Architecture</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-row">
+          <div class="product-id">№ 04</div>
+          <div>
+            <h3 class="product-name" data-lang="zh">全链路监控告警平台</h3>
+            <h3 class="product-name" data-lang="en">End-to-End Monitoring & Alerting Platform</h3>
+            <p class="product-desc" data-lang="zh">建立 PSI、缺失率、均值等模型与数据源质量指标的自动化监控体系，配置阈值规则，异常自动推送飞书告警并 at 负责人，实现秒级响应。</p>
+            <p class="product-desc" data-lang="en">Automated monitoring for PSI, missing-value rate, mean drift, and other model/data-quality signals, with threshold-based alerts pushed straight to Feishu, tagging the responsible owner for second-level response.</p>
+            <div class="tags">
+              <span class="tag">PSI / KS</span>
+              <span class="tag" data-lang="zh">自动化监控</span><span class="tag" data-lang="en">Automated Monitoring</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 PERSONAL AI ASSISTANT -->
+    <section id="assistant">
+      <div class="section-head">
+        <span class="section-num">02</span>
+        <h2 class="section-title">
+          <span data-lang="zh">个人 AI 助理</span>
+          <span data-lang="en">Personal AI Assistant</span>
+        </h2>
+      </div>
+      <p class="section-sub">
+        <span data-lang="zh">不是工具清单，是两个每天真的在跑的 cron job</span>
+        <span data-lang="en">not a tool list — two cron jobs that actually run, every day</span>
+      </p>
+
+      <div class="terminal">
+        <div class="line"><span class="prompt">$</span> cronjob --status</div>
+        <div class="line"><span class="comment"># 06:30 · morning-briefing · job_id: 1d268a297789</span></div>
+        <div class="line"><span class="ok">✓</span> openclaw → <span data-lang="zh">晨间资讯播报已生成</span><span data-lang="en">morning digest generated</span></div>
+        <div class="line">&nbsp;</div>
+        <div class="line"><span class="comment"># 23:00 · github-learning-log · job_id: 14c2c381629b</span></div>
+        <div class="line"><span class="ok">✓</span> hermes-agent → <span data-lang="zh">扫描 2,451+ 个活跃项目，写入今日学习笔记</span><span data-lang="en">scanned 2,451+ active repos, wrote tonight's learning notes</span></div>
+      </div>
+
+      <div class="agent-cards">
+        <div class="agent-card">
+          <h3 class="agent-name" data-lang="zh">晨间播报 · openclaw</h3>
+          <h3 class="agent-name" data-lang="en">Morning Briefing · openclaw</h3>
+          <p data-lang="zh">每天早上自动整理资讯，开机即读，不用自己刷信息流找重点。</p>
+          <p data-lang="en">Pulls and organizes the day's news automatically — open the laptop, the brief is already there.</p>
+        </div>
+        <div class="agent-card">
+          <h3 class="agent-name" data-lang="zh">夜间学习 · hermes-agent</h3>
+          <h3 class="agent-name" data-lang="en">Nightly Learning · hermes-agent</h3>
+          <p data-lang="zh">每晚自主去 GitHub 学习 AI 相关项目，筛出当日活跃 Top 项目并写成学习笔记，第二天直接拿来读。</p>
+          <p data-lang="en">Every night, it goes to GitHub on its own, ranks the day's most active AI projects, and writes up what it learned — ready to read the next morning.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 VISION -->
+    <section id="vision">
+      <div class="section-head">
+        <span class="section-num">03</span>
+        <h2 class="section-title">
+          <span data-lang="zh">愿景</span>
+          <span data-lang="en">Vision</span>
+        </h2>
+        <span class="draft-tag" data-lang="zh">草稿</span>
+        <span class="draft-tag" data-lang="en">Draft</span>
+      </div>
+      <p class="section-sub">
+        <span data-lang="zh">待你确认 / 替换</span>
+        <span data-lang="en">pending your edit</span>
+      </p>
+
+      <div class="vision-block">
+        <blockquote class="vision" data-lang="zh">
+          想成为那种"懂业务、会判断、能把判断变成系统"的人——不是只会用 AI 写代码的人，也不是只懂业务、不知道技术边界在哪的人。
+        </blockquote>
+        <blockquote class="vision" data-lang="en">
+          I want to be someone who understands the business, makes the call, and can turn that judgment into a system — not someone who only codes with AI, and not someone who understands the business without knowing where the technology actually bends.
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- 04 STRENGTHS -->
+    <section id="strengths">
+      <div class="section-head">
+        <span class="section-num">04</span>
+        <h2 class="section-title">
+          <span data-lang="zh">个人优点</span>
+          <span data-lang="en">Strengths</span>
+        </h2>
+      </div>
+      <p class="section-sub">
+        <span data-lang="zh">评估指标 — 风控人看自己，也用打分卡</span>
+        <span data-lang="en">scorecard — a risk analyst reads themselves the same way</span>
+      </p>
+
+      <div class="scorecard">
+        <div class="score-row">
+          <div class="score-label">
+            <span class="strong" data-lang="zh">隐性问题产品化</span>
+            <span class="strong" data-lang="en">Turns friction into product</span>
+            <span class="desc" data-lang="zh">看见重复发生的痛点，会动手把它抽象成系统，而不是忍着或手动应付。</span>
+            <span class="desc" data-lang="en">Spots recurring pain points and builds a system for them, instead of tolerating the manual workaround.</span>
+            <div class="score-bar"><i style="width:92%"></i></div>
+          </div>
+          <div class="score-val">SIGNAL 0.92</div>
+        </div>
+
+        <div class="score-row">
+          <div class="score-label">
+            <span class="strong" data-lang="zh">技术纵深与广度并行</span>
+            <span class="strong" data-lang="en">Depth and breadth, together</span>
+            <span class="desc" data-lang="zh">从 IV / PSI 这类扎实的传统风控功底，到 RLHF、RAG 评估方法论，再到亲手交付一个开源项目。</span>
+            <span class="desc" data-lang="en">From classic risk fundamentals like IV/PSI to RLHF and RAG evaluation methodology — to actually shipping an open-source project.</span>
+            <div class="score-bar"><i style="width:88%"></i></div>
+          </div>
+          <div class="score-val">COVERAGE 0.88</div>
+        </div>
+
+        <div class="score-row">
+          <div class="score-label">
+            <span class="strong" data-lang="zh">交付导向</span>
+            <span class="strong" data-lang="en">Delivery-oriented</span>
+            <span class="desc" data-lang="zh">方案不停在 PPT 阶段——断网环境 20 分钟初始化、1-2 天 baseline，都是真实落地的数字。</span>
+            <span class="desc" data-lang="en">Solutions don't stay in slide decks — a 20-minute offline-environment init, a 1–2 day modeling baseline: real, shipped numbers.</span>
+            <div class="score-bar"><i style="width:95%"></i></div>
+          </div>
+          <div class="score-val">KS 0.95</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <span data-lang="zh">本案卷由 Andy 本人持续更新 · 最后归档 2026.06.21</span>
+    <span data-lang="en">This file is maintained by Andy · last filed 2026.06.21</span>
+  </footer>
+
+<script>
+  const btn = document.getElementById('langToggle');
+  let lang = 'zh';
+  btn.addEventListener('click', () => {
+    lang = lang === 'zh' ? 'en' : 'zh';
+    document.body.classList.toggle('lang-en', lang === 'en');
+    document.documentElement.lang = lang === 'zh' ? 'zh' : 'en';
+    btn.querySelectorAll('[data-tag]').forEach(el => {
+      el.classList.toggle('active', el.getAttribute('data-tag') === lang);
+      el.classList.toggle('dim', el.getAttribute('data-tag') !== lang);
+    });
+  });
+</script>
+
+</body>
+</html>
